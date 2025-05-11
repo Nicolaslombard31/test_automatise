@@ -28,6 +28,10 @@ async function convert() {
     const fromUnit = document.getElementById("fromUnit").value;
     const toUnit = document.getElementById("toUnit").value;
     let result;
+    if (isNaN(fromValue)) {
+        alert("Veuillez entrer une valeur valide.");
+        return;
+    }    
 
     switch (category) {
         case "length":
@@ -98,7 +102,19 @@ function convertVolume(value, from, to) {
 }
 
 async function convertCurrency(value, from, to) {
-    const response = await fetch(`https://api.exchangerate.host/convert?from=${from}&to=${to}`);
-    const data = await response.json();
-    return value * data.result;
+    try {
+        const response = await fetch(`https://api.exchangerate.host/convert?from=${from}&to=${to}`);
+        const data = await response.json();
+
+        console.log("Réponse API :", data); // debug
+
+        if (!data.result) {
+            throw new Error("Taux de conversion non trouvé.");
+        }
+
+        return (value * data.result).toFixed(2);
+    } catch (error) {
+        console.error("Erreur de conversion :", error);
+        return "Conversion impossible";
+    }
 }
